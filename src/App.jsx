@@ -13,12 +13,12 @@ function App() {
     title: "",
     year: "",
     director: "",
-    genres: [],
+    actors: "",
     runtime: "",
   });
 
   const getAllMovies = async () => {
-    await axios.get("https://movies-crud-app-backend.vercel.app/all-movies").then((res) => {
+    await axios.get("http://localhost:5000/movie").then((res) => {
       setMovies(res.data);
       setFilterMovies(res.data);
       console.log(res.data);
@@ -31,37 +31,49 @@ function App() {
   //search functions
   const handleSearch = (e) => {
     const searchText = e.target.value.toLowerCase();
-    const filteredMovies = movies.filter(
-      (movie) =>
-        movie.title.toLowerCase().includes(searchText) ||
-        movie.director.toLowerCase().includes(searchText) ||
-        movie.genres[0].toLowerCase().includes(searchText) ||
-        movie.year.toString().includes(searchText) ||
-        movie.runtime.toString().includes(searchText)
-    );
+
+    const filteredMovies = movies.filter((movie) => {
+        const title = movie.title ? movie.title.toLowerCase() : '';
+        const director = movie.director ? movie.director.toLowerCase() : '';
+        const year = movie.year ? movie.year.toString() : '';
+        const runtime = movie.runtime ? movie.runtime.toString() : '';
+        const actors = movie.actors ? movie.actors.toString().toLowerCase() : '';
+
+        return (
+            title.includes(searchText) ||
+            director.includes(searchText) ||
+            year.includes(searchText) ||
+            runtime.includes(searchText) ||
+            actors.includes(searchText)
+        );
+    });
+
     setFilterMovies(filteredMovies);
-  };
+};
+
 
   //delete functions
-  const handleDelete = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this movie?"
-    );
-
+  const handleDelete = async (movieId) => {
+    const isConfirmed = window.confirm("Are you sure you want to delete this movie?");
+    
     if (isConfirmed) {
-      await axios.delete(`https://movies-crud-app-backend.vercel.app/delete/${id}`).then((res) => {
-        setMovies(res.data);
-        setFilterMovies(res.data);
-      });
+      try {
+        const response = await axios.delete(`http://localhost:5000/movie/${movieId}`);
+        setMovies(response.data);
+        setFilterMovies(response.data);
+        window.location.reload();
+      } catch (error) {
+        console.error("Error deleting movie:", error);
+      }
     }
-  };
+  }
 
   const handleAdd = () => {
     setMoviesData({
       title: "",
       year: "",
       director: "",
-      genres: [],
+      actors: "",
       runtime: "",
     });
     setAddMovieModal(true);
@@ -77,20 +89,20 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (moviesData.id) {
+    if (moviesData._id) {
       await axios
-        .patch(`https://movies-crud-app-backend.vercel.app/add-movie/${moviesData.id}`, moviesData)
+        .put(`http://localhost:5000/movie/${moviesData._id}`, moviesData)
         .then((res) => console.log(res));
     } else {
       await axios
-        .post("https://movies-crud-app-backend.vercel.app/add-movie", moviesData)
+        .post("http://localhost:5000/movie", moviesData)
         .then((res) => console.log(res));
     }
     setMoviesData({
       title: "",
       year: "",
       director: "",
-      genres: [],
+      actors: "",
       runtime: "",
     });
     setAddMovieModal(false);
@@ -122,7 +134,7 @@ function App() {
             <th>Title</th>
             <th>Release Year</th>
             <th>Director</th>
-            <th>Genre</th>
+            <th>Actors</th>
             <th>Run Time</th>
             <th>Edit</th>
             <th>Delete</th>
@@ -137,7 +149,7 @@ function App() {
                   <td>{movie.title}</td>
                   <td>{movie.year}</td>
                   <td>{movie.director}</td>
-                  <td>{movie.genres[0]}</td>
+                  <td>{movie.actors}</td>
                   <td>{movie.runtime}</td>
                   <td>
                     <button
@@ -150,7 +162,7 @@ function App() {
                   <td>
                     <button
                       className="btn red"
-                      onClick={() => handleDelete(movie.id)}
+                      onClick={() => handleDelete(movie._id)}
                     >
                       Delete
                     </button>
@@ -206,14 +218,14 @@ function App() {
               />
             </div>
             <div className="input-group">
-              <label htmlFor="genre" className="genre">
-                Genre
+              <label htmlFor="actors" className="actors">
+                Actors
               </label>
               <input
                 type="text"
-                name="genres"
-                id="genre"
-                value={moviesData.genres}
+                name="actors"
+                id="actors"
+                value={moviesData.actors}
                 onChange={handleData}
               />
             </div>
