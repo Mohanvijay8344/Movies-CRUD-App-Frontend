@@ -18,11 +18,13 @@ function App() {
   });
 
   const getAllMovies = async () => {
-    await axios.get("http://localhost:5000/movie").then((res) => {
-      setMovies(res.data);
-      setFilterMovies(res.data);
-      console.log(res.data);
-    });
+    await axios
+      .get("https://crud-application-nestjs-u7ij.vercel.app/movie")
+      .then((res) => {
+        setMovies(res.data);
+        setFilterMovies(res.data);
+        console.log(res.data);
+      });
   };
   useEffect(() => {
     getAllMovies();
@@ -33,32 +35,35 @@ function App() {
     const searchText = e.target.value.toLowerCase();
 
     const filteredMovies = movies.filter((movie) => {
-        const title = movie.title ? movie.title.toLowerCase() : '';
-        const director = movie.director ? movie.director.toLowerCase() : '';
-        const year = movie.year ? movie.year.toString() : '';
-        const runtime = movie.runtime ? movie.runtime.toString() : '';
-        const actors = movie.actors ? movie.actors.toString().toLowerCase() : '';
+      const title = movie.title ? movie.title.toLowerCase() : "";
+      const director = movie.director ? movie.director.toLowerCase() : "";
+      const year = movie.year ? movie.year.toString() : "";
+      const runtime = movie.runtime ? movie.runtime.toString() : "";
+      const actors = movie.actors ? movie.actors.toString().toLowerCase() : "";
 
-        return (
-            title.includes(searchText) ||
-            director.includes(searchText) ||
-            year.includes(searchText) ||
-            runtime.includes(searchText) ||
-            actors.includes(searchText)
-        );
+      return (
+        title.includes(searchText) ||
+        director.includes(searchText) ||
+        year.includes(searchText) ||
+        runtime.includes(searchText) ||
+        actors.includes(searchText)
+      );
     });
 
     setFilterMovies(filteredMovies);
-};
-
+  };
 
   //delete functions
   const handleDelete = async (movieId) => {
-    const isConfirmed = window.confirm("Are you sure you want to delete this movie?");
-    
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this movie?"
+    );
+
     if (isConfirmed) {
       try {
-        const response = await axios.delete(`http://localhost:5000/movie/${movieId}`);
+        const response = await axios.delete(
+          `https://crud-application-nestjs-u7ij.vercel.app/movie/${movieId}`
+        );
         setMovies(response.data);
         setFilterMovies(response.data);
         window.location.reload();
@@ -66,7 +71,7 @@ function App() {
         console.error("Error deleting movie:", error);
       }
     }
-  }
+  };
 
   const handleAdd = () => {
     setMoviesData({
@@ -91,11 +96,17 @@ function App() {
     e.preventDefault();
     if (moviesData._id) {
       await axios
-        .put(`http://localhost:5000/movie/${moviesData._id}`, moviesData)
+        .put(
+          `https://crud-application-nestjs-u7ij.vercel.app/movie/${moviesData._id}`,
+          moviesData
+        )
         .then((res) => console.log(res));
     } else {
       await axios
-        .post("http://localhost:5000/movie", moviesData)
+        .post(
+          "https://crud-application-nestjs-u7ij.vercel.app/movie",
+          moviesData
+        )
         .then((res) => console.log(res));
     }
     setMoviesData({
